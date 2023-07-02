@@ -10,10 +10,6 @@ import time
 
 app = FastAPI()
 
-class Player(BaseModel):
-    ally: list[str]
-    enemy: list[str]
-
 offset_x = 180
 offset_y_ally = 75
 offset_y_enemy = 580
@@ -22,7 +18,11 @@ height = 24
 gap = 200
 
 
-def get_player_names(img: Image) -> Player:
+class Player(BaseModel):
+    ally: list[str]
+    enemy: list[str]
+
+async def get_player_names(img: Image) -> Player:
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     img = cv2.bitwise_not(img)
     img = Image.fromarray(img)
@@ -45,9 +45,11 @@ def get_player_names(img: Image) -> Player:
 
     return Player(**players)
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 @app.post("/ocr/smite/upload")
 async def smite_upload(file: UploadFile = File(...)):
@@ -55,12 +57,13 @@ async def smite_upload(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         img = Image.open(io.BytesIO(contents))
-        players = get_player_names(img)
+        players = await get_player_names(img)
         end_time = time.time()
         time_taken = end_time - start_time
         return {"players": players, "time_taken": time_taken}
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid image file.")
+
 
 @app.post("/ocr/upload")
 async def ocr_upload(file: UploadFile = File(...)):
@@ -74,6 +77,7 @@ async def ocr_upload(file: UploadFile = File(...)):
         return {"text": text, "time_taken": time_taken}
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid image file.")
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
