@@ -43,7 +43,7 @@ async def get_player_names(img: Image) -> Players:
             else:
                 players["enemy"].append(text)
 
-    return Player(**players)
+    return Players(**players)
 
 
 @app.get("/")
