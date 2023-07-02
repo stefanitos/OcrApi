@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, HTTPException, File
 from pydantic import BaseModel
-from typing import List
 from PIL import Image
 import pytesseract
 import cv2
@@ -12,17 +11,18 @@ import time
 app = FastAPI()
 
 class Player(BaseModel):
-    ally: List[str]
-    enemy: List[str]
+    ally: list[str]
+    enemy: list[str]
+
+offset_x = 180
+offset_y_ally = 75
+offset_y_enemy = 580
+width = 150
+height = 24
+gap = 200
+
 
 def get_player_names(img: Image) -> Player:
-    offset_x = 180
-    offset_y_ally = 75
-    offset_y_enemy = 580
-    width = 150
-    height = 24
-    gap = 200
-
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     img = cv2.bitwise_not(img)
     img = Image.fromarray(img)
@@ -31,10 +31,7 @@ def get_player_names(img: Image) -> Player:
     enemy_players_coords = [(offset_x + (width + gap) * i, offset_y_enemy, offset_x + (width + gap) * i + width, offset_y_enemy + height) for i in range(5)]
     all_players_coords = ally_players_coords + enemy_players_coords
 
-    players = {
-        "ally": [],
-        "enemy": []
-    }
+    players = {"ally": [], "enemy": []}
 
     for i, box in enumerate(all_players_coords):
         cropped_img = img.crop(box)
@@ -64,7 +61,6 @@ async def smite_upload(file: UploadFile = File(...)):
         return {"players": players, "time_taken": time_taken}
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid image file.")
-    
 
 @app.post("/ocr/upload")
 async def ocr_upload(file: UploadFile = File(...)):
@@ -78,7 +74,6 @@ async def ocr_upload(file: UploadFile = File(...)):
         return {"text": text, "time_taken": time_taken}
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid image file.")
-    
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
