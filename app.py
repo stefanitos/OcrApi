@@ -18,11 +18,11 @@ height = 24
 gap = 200
 
 
-class Player(BaseModel):
+class Players(BaseModel):
     ally: list[str]
     enemy: list[str]
 
-async def get_player_names(img: Image) -> Player:
+async def get_player_names(img: Image) -> Players:
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     img = cv2.bitwise_not(img)
     img = Image.fromarray(img)
