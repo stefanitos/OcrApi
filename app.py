@@ -14,3 +14,5 @@ async def upload(request: Request):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
     # Read the image and convert it to text
     text = pytesseract.image_to_string(image.file.read())
+
+    
