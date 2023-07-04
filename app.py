@@ -57,6 +57,8 @@ async def smite_upload(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         img = Image.open(io.BytesIO(contents))
+
+        # img.save("test.png")
         players = await get_player_names(img)
         end_time = time.time()
         time_taken = end_time - start_time
@@ -71,7 +73,7 @@ async def ocr_upload(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         img = Image.open(io.BytesIO(contents))
-        text = pytesseract.image_to_string(img, config="--psm 7")
+        text = pytesseract.image_to_string(img)
         end_time = time.time()
         time_taken = end_time - start_time
         return {"text": text, "time_taken": time_taken}
