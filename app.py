@@ -36,6 +36,7 @@ async def get_player_names(img: Image) -> Players:
     for i, box in enumerate(all_players_coords):
         cropped_img = img.crop(box)
         text = pytesseract.image_to_string(cropped_img, config="--psm 7").strip()
+        text = "".join([c for c in text if c.isalpha()])
 
         if text:
             if i < 5:
@@ -64,7 +65,7 @@ async def smite_upload(file: UploadFile = File(...)):
         time_taken = end_time - start_time
         return {"players": players, "time_taken": time_taken}
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid image file.")
+        return {"players": {"ally": [], "enemy": []}, "time_taken": 0}
 
 
 @app.post("/ocr/upload")
