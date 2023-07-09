@@ -36,7 +36,7 @@ async def get_player_names(img: Image) -> Players:
     for i, box in enumerate(all_players_coords):
         cropped_img = img.crop(box)
         text = pytesseract.image_to_string(cropped_img, config="--psm 7").strip()
-        text = "".join([c for c in text if c.isalpha()])
+        text = "".join([c for c in text if c.isalpha() or c.isdigit()])
 
         if text:
             if i < 5:
