@@ -87,7 +87,6 @@ async def upload_form():
     </html>
     """
 
-
 @app.post("/ocr/upload")
 async def ocr_upload(file: UploadFile = File(...)):
     start_time = time.time()
